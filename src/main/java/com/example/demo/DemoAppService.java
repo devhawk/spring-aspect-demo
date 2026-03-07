@@ -2,6 +2,7 @@ package com.example.demo;
 
 import java.util.List;
 
+import com.example.demo.aspect.Durable;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ public class DemoAppService {
     this.jdbi = jdbi;
   }
 
+  @Durable
   public List<String> getTables() {
     return jdbi.withHandle(
         h ->

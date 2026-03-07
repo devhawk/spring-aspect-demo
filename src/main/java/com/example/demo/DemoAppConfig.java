@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class DemoAppConfig {
   @Bean
   public Jdbi jdbi(DataSource dataSource) {
+    System.out.println("DemoAppConfig.jdbi");
+
     var jdbi = Jdbi.create(dataSource);
     jdbi.installPlugin(new SqlObjectPlugin());
     return jdbi;

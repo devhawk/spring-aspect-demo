@@ -1,6 +1,7 @@
 package com.example.demo.aspect;
 
-import org.jdbi.v3.core.Jdbi;
+import dev.dbos.transact.DBOS;
+
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
@@ -9,26 +10,26 @@ import org.springframework.stereotype.Component;
 @Component("dev.dbos.transact.durableLifetime")
 public class DurableLifetime implements SmartLifecycle {
 
-  private final Jdbi jdbi;
+  private final DBOS.Instance dbos;
   private boolean running = false;
 
   // DBOS Instance would be injected like this Jdbi instance
-  public DurableLifetime(Jdbi jdbi) {
-    this.jdbi = jdbi;
+  public DurableLifetime(DBOS.Instance dbos) {
+    this.dbos = dbos;
   }
 
   @Override
   public void start() {
     running = true;
     System.out.println("DurableLifetime started");
-    // dbos.launch would be called here
+    dbos.launch();
   }
 
   @Override
   public void stop() {
     running = false;
     System.out.println("DurableLifetime stopped");
-    // dbos.shutdown would be called here
+    dbos.shutdown();
   }
 
   @Override

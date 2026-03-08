@@ -8,17 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import dev.dbos.transact.DBOS;
+import dev.dbos.transact.workflow.SerializationStrategy;
+
 // this class populates the workflow registry
 
 @Component("dev.dbos.transact.durableScanner")
 public class DurableScanner implements SmartInitializingSingleton {
   private final ApplicationContext applicationContext;
-  private final DurableRegistry durableRegistry;
+  private final DBOS.Instance dbos;
 
   @Autowired
-  public DurableScanner(ApplicationContext applicationContext, DurableRegistry durableRegistry) {
+  public DurableScanner(ApplicationContext applicationContext, DBOS.Instance dbos) {
     this.applicationContext = applicationContext;
-    this.durableRegistry = durableRegistry;
+    this.dbos = dbos;
   }
 
   @Override
@@ -35,14 +38,13 @@ public class DurableScanner implements SmartInitializingSingleton {
       }
       Method[] methods = targetClass.getDeclaredMethods();
       for (Method method : methods) {
-        if (method.isAnnotationPresent(Durable.class)) {
-          String key = method.getAnnotation(Durable.class).name();
-          if (key.isEmpty()) {
-            key = targetClass.getName() + "." + method.getName();
-          }
-          System.out.println("Registering @Durable method: " + key);
-          durableRegistry.register(key, bean, method);
+        Durable wfTag = method.getAnnotation(Durable.class);
+        if (wfTag == null) {
+          continue;
         }
+
+        var workflowName = wfTag.name().isEmpty() ? method.getName() : wfTag.name();
+        dbos.registerWorkflow(workflowName,targetClass.getName(), null, bean, method, -1, SerializationStrategy.DEFAULT);
       }
     }
   }

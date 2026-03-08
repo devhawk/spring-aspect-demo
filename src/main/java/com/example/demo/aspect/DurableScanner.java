@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-@Component
+// this class populates the workflow registry
+
+@Component("dev.dbos.transact.durableScanner")
 public class DurableScanner implements SmartInitializingSingleton {
   private final ApplicationContext applicationContext;
   private final DurableRegistry durableRegistry;
@@ -23,8 +25,7 @@ public class DurableScanner implements SmartInitializingSingleton {
   public void afterSingletonsInstantiated() {
     String[] beanNames = applicationContext.getBeanDefinitionNames();
     for (String beanName : beanNames) {
-      // Skip infrastructure beans to avoid circular dependencies
-      if (beanName.equals("durableScanner") || beanName.equals("durableRegistry")) {
+      if (beanName.startsWith("dev.dbos.transact.")) {
         continue;
       }
       Object bean = applicationContext.getBean(beanName);
@@ -40,7 +41,7 @@ public class DurableScanner implements SmartInitializingSingleton {
             key = targetClass.getName() + "." + method.getName();
           }
           System.out.println("Registering @Durable method: " + key);
-          durableRegistry.register(key, method);
+          durableRegistry.register(key, bean, method);
         }
       }
     }

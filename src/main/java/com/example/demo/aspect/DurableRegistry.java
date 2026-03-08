@@ -6,19 +6,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
-@Component
-public class DurableRegistry {
-  private final Map<String, Method> registry = new ConcurrentHashMap<>();
+// This is the demo's version of WorkflowRegistry
 
-  public void register(String key, Method method) {
-    registry.put(key, method);
+@Component("dev.dbos.transact.durableRegistry")
+public class DurableRegistry {
+  private final Map<String, RegisteredDurableMethod> registry = new ConcurrentHashMap<>();
+
+  public void register(String key, Object bean, Method method) {
+    registry.put(key, new RegisteredDurableMethod(bean, method));
   }
 
-  public Method get(String key) {
+  public RegisteredDurableMethod get(String key) {
     return registry.get(key);
   }
 
-  public Map<String, Method> getAll() {
+  public Map<String, RegisteredDurableMethod> getAll() {
     return registry;
   }
 }

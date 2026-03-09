@@ -45,8 +45,8 @@ public class DurableScanner implements SmartInitializingSingleton {
 
       Method[] methods = targetClass.getDeclaredMethods();
       for (Method method : methods) {
-        Durable wfTag = method.getAnnotation(Durable.class);
-        if (wfTag == null) {
+        Durable durableTag = method.getAnnotation(Durable.class);
+        if (durableTag == null) {
           continue;
         }
 
@@ -62,7 +62,7 @@ public class DurableScanner implements SmartInitializingSingleton {
           Objects.requireNonNull(targetObject);
         }
 
-        var workflowName = wfTag.name().isEmpty() ? method.getName() : wfTag.name();
+        var workflowName = durableTag.name().isEmpty() ? method.getName() : durableTag.name();
 
         dbos.registerWorkflow(
             workflowName,

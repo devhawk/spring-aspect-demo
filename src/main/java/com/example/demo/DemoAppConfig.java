@@ -16,18 +16,20 @@ import org.springframework.context.annotation.Configuration;
 public class DemoAppConfig {
   @Bean
   public Jdbi jdbi(DataSource dataSource) {
-    System.out.println("DemoAppConfig.jdbi");
-
     var jdbi = Jdbi.create(dataSource);
     jdbi.installPlugin(new SqlObjectPlugin());
     return jdbi;
   }
 
+  // eventually, this will be in the dbos spring boot package
   @Bean
   public DBOS.Instance dbos(DBOSConfig config) {
     return new DBOS.Instance(config);
   }
 
+  // eventually, we will read these out of app properties,
+  // similar to how the DataSource bean that gets passed to
+  // jdbi method above is created
   @Bean
   public DBOSConfig dbosConfig() {
     String databaseUrl = System.getenv("DBOS_SYSTEM_JDBC_URL");

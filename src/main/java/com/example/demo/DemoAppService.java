@@ -52,17 +52,12 @@ public class DemoAppService {
   }
 
   private InsultResponse getRandomInsult() {
-    String url = "https://evilinsult.com/generate_insult.php?lang=en&type=json";
-
-    try {
-      InsultResponse response = restTemplate.getForObject(url, InsultResponse.class);
-      if (response != null) {
-        return response;
-      }
-      return new InsultResponse("0", "Failed to get insult");
-    } catch (Exception e) {
-      return new InsultResponse("0", "Error: " + e.getMessage());
+    var url = "https://evilinsult.com/generate_insult.php?lang=en&type=json";
+    var response = restTemplate.getForObject(url, InsultResponse.class);
+    if (response == null) {
+      throw new RuntimeException("API returned null response");
     }
+    return response;
   }
 
   private List<String> getTables() {

@@ -16,7 +16,7 @@ public class DemoAppController {
     this.demoAppService = demoAppService;
   }
 
-  @GetMapping("/tables")
+  @GetMapping("/")
   @ResponseBody
   public DemoAppService.TablesWorkflowResponse getTables() {
     return demoAppService.tablesWorkflow();

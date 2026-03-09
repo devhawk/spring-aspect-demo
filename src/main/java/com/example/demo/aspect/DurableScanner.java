@@ -40,7 +40,6 @@ public class DurableScanner implements SmartInitializingSingleton {
         continue;
       }
 
-      // Extract the actual target object (non-intercepted version)
       Object targetObject = null;
 
       Method[] methods = targetClass.getDeclaredMethods();
@@ -50,6 +49,7 @@ public class DurableScanner implements SmartInitializingSingleton {
           continue;
         }
 
+        // Extract the actual target object (non-intercepted version)
         if (targetObject == null) {
           if (AopUtils.isAopProxy(bean) && bean instanceof Advised) {
             try {

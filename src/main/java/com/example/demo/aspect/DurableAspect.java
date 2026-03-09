@@ -25,13 +25,14 @@ public class DurableAspect {
   @Around("@annotation(com.example.demo.aspect.Durable)")
   public Object interceptDurableMethod(ProceedingJoinPoint joinPoint) throws Throwable {
 
-    var sig = (MethodSignature)joinPoint.getSignature();
+    var sig = (MethodSignature) joinPoint.getSignature();
     var method = sig.getMethod();
     var durableTag = Objects.requireNonNull(method.getAnnotation(Durable.class));
 
     var workflowName = durableTag.name().isEmpty() ? method.getName() : durableTag.name();
     var className = joinPoint.getTarget().getClass().getName();
 
-    return dbos.handleWorkflow(workflowName,className, null, joinPoint.getArgs(), sig.getReturnType());
+    return dbos.handleWorkflow(
+        workflowName, className, null, joinPoint.getArgs(), sig.getReturnType());
   }
 }

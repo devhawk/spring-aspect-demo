@@ -1,7 +1,5 @@
 package com.example.demo;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +18,7 @@ public class DemoAppController {
 
   @GetMapping("/tables")
   @ResponseBody
-  public List<String> getTables() {
-    return demoAppService.getTables();
+  public DemoAppService.TablesWorkflowResponse getTables() {
+    return demoAppService.tablesWorkflow();
   }
 }

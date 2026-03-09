@@ -1,15 +1,17 @@
 package com.example.demo.aspect;
 
-import java.lang.reflect.Method;
+import dev.dbos.transact.DBOS;
+import dev.dbos.transact.workflow.SerializationStrategy;
 
+import java.lang.reflect.Method;
+import java.util.Objects;
+
+import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import dev.dbos.transact.DBOS;
-import dev.dbos.transact.workflow.SerializationStrategy;
 
 // this class populates the workflow registry
 
@@ -31,11 +33,16 @@ public class DurableScanner implements SmartInitializingSingleton {
       if (beanName.startsWith("dev.dbos.transact.")) {
         continue;
       }
+
       Object bean = applicationContext.getBean(beanName);
       Class<?> targetClass = AopUtils.getTargetClass(bean);
       if (targetClass == null) {
         continue;
       }
+
+      // Extract the actual target object (non-intercepted version)
+      Object targetObject = null;
+
       Method[] methods = targetClass.getDeclaredMethods();
       for (Method method : methods) {
         Durable wfTag = method.getAnnotation(Durable.class);
@@ -43,8 +50,28 @@ public class DurableScanner implements SmartInitializingSingleton {
           continue;
         }
 
+        if (targetObject == null) {
+          if (AopUtils.isAopProxy(bean) && bean instanceof Advised) {
+            try {
+              targetObject = ((Advised) bean).getTargetSource().getTarget();
+            } catch (Exception e) {
+              throw new RuntimeException(e);
+            }
+          }
+
+          Objects.requireNonNull(targetObject);
+        }
+
         var workflowName = wfTag.name().isEmpty() ? method.getName() : wfTag.name();
-        dbos.registerWorkflow(workflowName,targetClass.getName(), null, bean, method, -1, SerializationStrategy.DEFAULT);
+
+        dbos.registerWorkflow(
+            workflowName,
+            targetClass.getName(),
+            null,
+            targetObject,
+            method,
+            -1,
+            SerializationStrategy.DEFAULT);
       }
     }
   }

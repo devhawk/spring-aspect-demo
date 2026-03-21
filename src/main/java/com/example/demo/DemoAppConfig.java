@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DemoAppConfig {
+
+  // DataSource url, username, password and db driver read from app properties
   @Bean
   public Jdbi jdbi(DataSource dataSource) {
     var jdbi = Jdbi.create(dataSource);
@@ -34,7 +36,7 @@ public class DemoAppConfig {
   public DBOSConfig dbosConfig() {
     String databaseUrl = System.getenv("DBOS_SYSTEM_JDBC_URL");
     if (databaseUrl == null || databaseUrl.isEmpty()) {
-      databaseUrl = "jdbc:postgresql://localhost:5432/spring_aspect_demo";
+      databaseUrl = "jdbc:postgresql://localhost:5432/spring_aspect_demo_sysdb";
     }
     return DBOSConfig.defaults("spring-aspect-demo")
         .withDatabaseUrl(databaseUrl)
